@@ -3,6 +3,7 @@ package com.orco.learnreactivespring.fluxandmonoplayground;
 import org.junit.jupiter.api.Test;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class FluxAndMonoTest {
@@ -21,7 +22,7 @@ public class FluxAndMonoTest {
     }
 
     @Test
-    public void FluxTestElements_WithoutError() {
+    public void fluxTestElements_WithoutError() {
         Flux<String> stringFlux = Flux.just("Spring", "Spring Boot", "Reactive Spring").log();
 
         StepVerifier.create(stringFlux)
@@ -33,7 +34,7 @@ public class FluxAndMonoTest {
     }
 
     @Test
-    public void FluxTestElements_WithError() {
+    public void fluxTestElements_WithError() {
         Flux<String> stringFlux = Flux.just("Spring", "Spring Boot", "Reactive Spring")
                 .concatWith(Flux.error(new RuntimeException("Test error")))
                 .log()
@@ -49,7 +50,7 @@ public class FluxAndMonoTest {
     }
 
     @Test
-    public void FluxTestElementsCount_WithError() {
+    public void fluxTestElementsCount_WithError() {
         Flux<String> stringFlux = Flux.just("Spring", "Spring Boot", "Reactive Spring")
                 .concatWith(Flux.error(new RuntimeException("Test error")))
                 .log()
@@ -62,7 +63,7 @@ public class FluxAndMonoTest {
     }
 
     @Test
-    public void FluxTestElements_WithErrorAlternateWay() {
+    public void fluxTestElements_WithErrorAlternateWay() {
         Flux<String> stringFlux = Flux.just("Spring", "Spring Boot", "Reactive Spring")
                 .concatWith(Flux.error(new RuntimeException("Test error")))
                 .log()
@@ -71,6 +72,22 @@ public class FluxAndMonoTest {
         StepVerifier.create(stringFlux)
                 .expectNext("Spring", "Spring Boot", "Reactive Spring")
                 .expectErrorMessage("Test error")
+                .verify();
+    }
+
+    @Test
+    public void monoTest() {
+            Mono<String> strnigMono =Mono.just("Spring");
+
+            StepVerifier.create(strnigMono)
+                .expectNext("Spring")
+                .verifyComplete();
+    }
+
+    @Test
+    public void monoTest_WithError() {
+            StepVerifier.create(Mono.error(new RuntimeException("Exception occurred")).log())
+                .expectError(RuntimeException.class)
                 .verify();
     }
 
