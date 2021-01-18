@@ -1,6 +1,11 @@
 package com.orco.learnreactivespring.fluxandmonoplayground;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
@@ -46,6 +51,41 @@ public class FluxAndMonoBackPressureTest {
     }
 
     @Test
+    public void customizeBackPressure_alterantive() {
+        Flux<Integer> integerFlux = Flux.range(1, 10).log();
+
+        List<Integer> elements = new ArrayList<>();
+        integerFlux.subscribeWith(new Subscriber<Integer>() {
+            private Subscription s;
+            int onNextAmount;
+
+            @Override
+            public void onSubscribe(Subscription s) {
+                this.s = s;
+                s.request(2);
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                elements.add(integer);
+                onNextAmount++;
+                if (onNextAmount % 2 == 0) {
+                    s.request(2);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        });
+
+    }
+
+    @Test
     public void backPressure_cancel() {
         Flux<Integer> integerFlux = Flux.range(1, 10).log();
 
@@ -53,7 +93,6 @@ public class FluxAndMonoBackPressureTest {
                 , e -> System.err.println("Exception is: " + e.getMessage())
                 , () -> System.out.println("Done")
                 , subscription -> subscription.cancel());
-
     }
 
 }
