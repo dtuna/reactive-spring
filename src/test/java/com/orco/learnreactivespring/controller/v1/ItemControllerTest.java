@@ -144,4 +144,36 @@ class ItemControllerTest {
 
     }
 
+    @Test
+    public void testupdateItem() {
+//        Item item = new Item("ABCD", "Sony Headphone", 135.99);
+        double newPrice = 135.99;
+        Item item = new Item(null, "Sony Headphone", newPrice);
+
+        webTestClient.put().uri(ITEM_END_POINT_v1.concat("/{id}"), "ABCD")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price").isEqualTo(newPrice);
+
+    }
+
+    @Test
+    public void testupdateItem_notFound() {
+//        Item item = new Item("ABCD", "Sony Headphone", 135.99);
+        double newPrice = 135.99;
+        Item item = new Item(null, "Sony Headphone", newPrice);
+
+        webTestClient.put().uri(ITEM_END_POINT_v1.concat("/{id}"), "A")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isNotFound();
+
+    }
+
 }
