@@ -52,7 +52,7 @@ class ItemControllerTest {
                 .deleteAll()
                 .thenMany(Flux.fromIterable(itemList))
                 .flatMap(itemReactiveRepository::save)
-                .doOnNext(item-> log.info(item.toString()))
+                .doOnNext(item -> log.info(item.toString()))
                 .blockLast();
     }
 
@@ -97,6 +97,24 @@ class ItemControllerTest {
         StepVerifier.create(fluxItems.log("Value from network"))
                 .expectNextCount(5)
                 .verifyComplete();
+
+    }
+
+    @Test
+    public void TestGetItem() {
+        webTestClient.get().uri(ITEM_END_POINT_v1.concat("/{id}"), "ABCD")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", 260.0);
+
+    }
+
+    @Test
+    public void TestGetItem_notFound() {
+        webTestClient.get().uri(ITEM_END_POINT_v1.concat("/{id}"), "A")
+                .exchange()
+                .expectStatus().isNotFound();
 
     }
 

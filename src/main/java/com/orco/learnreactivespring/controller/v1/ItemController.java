@@ -4,10 +4,13 @@ import com.orco.learnreactivespring.document.Item;
 import com.orco.learnreactivespring.repository.ItemReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static com.orco.learnreactivespring.constants.ItemConstants.ITEM_END_POINT_v1;
 
@@ -18,10 +21,15 @@ public class ItemController {
     @Autowired
     private ItemReactiveRepository itemReactiveRepository;
 
-    @GetMapping(value = ITEM_END_POINT_v1
-//            , produces = {MediaType.APPLICATION_STREAM_JSON_VALUE}
-            )
+    @GetMapping(value = ITEM_END_POINT_v1)
     private Flux<Item> getAllItems() {
         return itemReactiveRepository.findAll();
+    }
+
+    @GetMapping(value = ITEM_END_POINT_v1 + "/{id}")
+    private Mono<ResponseEntity<Item>> getItem(@PathVariable String id) {
+        return itemReactiveRepository.findById(id)
+                .map(item -> new ResponseEntity<>(item, HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
