@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ class ItemControllerTest {
     }
 
     @Test
-    public void TestGetAllItems() {
+    public void testGetAllItems() {
         webTestClient.get().uri(ITEM_END_POINT_v1)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -69,7 +70,7 @@ class ItemControllerTest {
     }
 
     @Test
-    public void TestGetAllItems_approach2() {
+    public void testGetAllItems_approach2() {
         webTestClient.get().uri(ITEM_END_POINT_v1)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -86,7 +87,7 @@ class ItemControllerTest {
     }
 
     @Test
-    public void TestGetAllItems_approach3() {
+    public void testGetAllItems_approach3() {
         Flux<Item> fluxItems = webTestClient.get().uri(ITEM_END_POINT_v1)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -101,7 +102,7 @@ class ItemControllerTest {
     }
 
     @Test
-    public void TestGetItem() {
+    public void testGetItem() {
         webTestClient.get().uri(ITEM_END_POINT_v1.concat("/{id}"), "ABCD")
                 .exchange()
                 .expectStatus().isOk()
@@ -111,10 +112,25 @@ class ItemControllerTest {
     }
 
     @Test
-    public void TestGetItem_notFound() {
+    public void testGetItem_notFound() {
         webTestClient.get().uri(ITEM_END_POINT_v1.concat("/{id}"), "A")
                 .exchange()
                 .expectStatus().isNotFound();
+
+    }
+
+    @Test
+    public void testCreateItem() {
+        Item item = new Item(null, "Iphone 12", 999.99);
+        webTestClient.post().uri(ITEM_END_POINT_v1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.description").isEqualTo("Iphone 12")
+                .jsonPath("$.price").isEqualTo(999.99);
 
     }
 
