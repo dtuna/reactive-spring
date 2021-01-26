@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-@Profile("test")
+@Profile("dev")
 public class ItemDataInitializer implements CommandLineRunner {
 
     @Autowired

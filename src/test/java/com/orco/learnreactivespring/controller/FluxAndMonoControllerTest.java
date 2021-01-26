@@ -1,21 +1,25 @@
 package com.orco.learnreactivespring.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.orco.learnreactivespring.repository.ItemReactiveRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.EntityExchangeResult;
-import org.springframework.test.web.reactive.server.WebTestClient;
-
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest
@@ -23,6 +27,9 @@ public class FluxAndMonoControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @MockBean
+    private ItemReactiveRepository itemReactiveRepository;
 
     @Test
     public void testFlux_approach1() {
@@ -52,7 +59,7 @@ public class FluxAndMonoControllerTest {
 
     @Test
     public void testFlux_approach3() {
-        List<Integer> expectedList = Arrays.asList(1,2,3,4);
+        List<Integer> expectedList = Arrays.asList(1, 2, 3, 4);
 
         EntityExchangeResult<List<Integer>> entityExchangeResult = webTestClient
                 .get().uri("/flux")
@@ -61,13 +68,13 @@ public class FluxAndMonoControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(Integer.class)
                 .returnResult();
-        
-        assertEquals(expectedList, entityExchangeResult.getResponseBody());        
+
+        assertEquals(expectedList, entityExchangeResult.getResponseBody());
     }
 
     @Test
     public void testFlux_approach4() {
-        List<Integer> expectedList = Arrays.asList(1,2,3,4);
+        List<Integer> expectedList = Arrays.asList(1, 2, 3, 4);
 
         webTestClient
                 .get().uri("/flux")
@@ -76,8 +83,8 @@ public class FluxAndMonoControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(Integer.class)
                 .consumeWith(response -> {
-                    assertEquals(expectedList, response.getResponseBody());        
-                });        
+                    assertEquals(expectedList, response.getResponseBody());
+                });
     }
 
     @Test
@@ -95,7 +102,7 @@ public class FluxAndMonoControllerTest {
                 .expectNext(1L)
                 .expectNext(2L)
                 .thenCancel()
-                .verify();        
+                .verify();
     }
 
     @Test
@@ -109,7 +116,7 @@ public class FluxAndMonoControllerTest {
                 .expectBody(Integer.class)
                 .consumeWith(response -> {
                     assertEquals(expectedValue, response.getResponseBody());
-                });     
+                });
     }
 
 }
