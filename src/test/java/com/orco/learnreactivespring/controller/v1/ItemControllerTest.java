@@ -134,4 +134,14 @@ class ItemControllerTest {
 
     }
 
+    @Test
+    public void testDeleteItem() {
+        webTestClient.delete().uri(ITEM_END_POINT_v1.concat("/{id}"), "ABCD")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Void.class);
+
+    }
+
 }
